@@ -3,12 +3,26 @@ import Button from '@material-ui/core/Button';
 import './App.css';
 
 function LinkAccountButton(props) {
+  const getIconImage = () => {
+    switch(props.name){
+      case 'apple': return '/images/apple.png';
+      case 'spotify': return '/images/spotify.png';
+      case 'youtube': return '/images/youtube.png';
+      default: return ""
+    }
+  }
+
   return (
     <Button
-      variant="outlined"
+      variant="contained"
       color={props.linked ? "primary" : "secondary"}
+      className="LinkAccountButton"
+      style={{
+        backgroundImage: `url(${getIconImage()})`,
+        backgroundSize: "140px 140px",
+      }}
     >
-      {props.name}
+    {""}
     </Button>
   );
 }
