@@ -12,7 +12,7 @@ RUN go install -v ./...
 RUN CGO_ENABLED=0 go build -o main .
 
 # -------- JS STEP -----------       
-FROM node:12.2.0-alpine
+FROM node:12.10.0-alpine
 
 WORKDIR /frontend
 
@@ -44,5 +44,3 @@ COPY --from=1 /frontend/build build
 EXPOSE $PORT
 
 CMD ["./main"]
-# RUN ls build
-# CMD ["ls"]
