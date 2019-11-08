@@ -8,10 +8,13 @@ type Song struct {
 
 type Playlist struct {
 	name  string
-	songs []song
+	songs []Song
 }
 
 type MusicService interface {
-	GetPlaylist() Playlist
-	CreatePlaylist(Playlist)
+	GetPlaylist() *Playlist
+	CreatePlaylist(*Playlist)
+}
+
+func main() {
 }
