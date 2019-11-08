@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	// heroku creates this env var automagically
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = *(flag.String("p", "80", "port to serve on"))
