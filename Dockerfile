@@ -12,6 +12,7 @@ RUN go install -v .
 
 RUN go build -o main .
 
-EXPOSE 80
+# heroku assigns this port
+EXPOSE $PORT
 
-CMD ["./main"]
+CMD ["./main -p $PORT"]
