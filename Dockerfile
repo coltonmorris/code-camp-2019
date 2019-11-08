@@ -1,6 +1,6 @@
 FROM golang:latest
 
-WORKDIR $GOPATH/src/github.com/coltonmorris/code-camp-2019
+WORKDIR $GOPATH/src/code-camp-2019
 
 COPY . .
 
