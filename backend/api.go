@@ -1,4 +1,8 @@
-package main
+package backend
+
+import (
+	log "github.com/sirupsen/logrus"
+)
 
 type Song struct {
 	artist string
@@ -11,12 +15,22 @@ type PlayCount struct {
 	songCoung    int
 }
 
+type Playlist struct {
+	name  string
+	songs []Song
+}
+
 type User interface {
 	GetEmail() string
 	GetAvailableServiceAccounts() []string
 	GetServiceAccount() ServiceAccount
 	// TODO: Add service account
 	GetAllPlaylistCounts() map[string]PlayCount
+}
+
+type SyncedSongs struct {
+	AcceptedSongs []Song
+	FailedSongs   []Song
 }
 
 type ServiceAccount interface {
@@ -26,10 +40,10 @@ type ServiceAccount interface {
 	AddSongs(string, []Song) (SyncedSongs, error)
 }
 
-type API struct{}
+type UserImpl struct{}
 
-func (api *API) TransferPlaylist(newPlaylistName, playlistName string, ogAccount, acceptingAccount ServiceAccount) (SyncedSongs, error) {
-	songs, err := ogAccount.GetPlaylist()
+func (user *UserImpl) TransferPlaylist(newPlaylistName, playlistName string, ogAccount, acceptingAccount ServiceAccount) (SyncedSongs, error) {
+	songs, err := ogAccount.GetPlaylist(playlistName)
 	if err != nil {
 		log.WithError(err).WithFields(log.Fields{
 			"playlistName":     playlistName,
@@ -44,8 +58,7 @@ func (api *API) TransferPlaylist(newPlaylistName, playlistName string, ogAccount
 		newPlaylistName = playlistName
 	}
 
-	newPlaylistName, err := acceptingAccount.CreatePlaylist(newPlaylistName)
-	if err != nil {
+	if newPlaylistName, err = acceptingAccount.CreatePlaylist(newPlaylistName); err != nil {
 		log.WithError(err).WithFields(log.Fields{
 			"playlistName":     playlistName,
 			"newName":          newPlaylistName,
