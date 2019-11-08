@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Song struct {
 	artist string
 	name   string
