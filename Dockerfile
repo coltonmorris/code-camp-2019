@@ -8,8 +8,8 @@ RUN go get -d -v ./...
 
 RUN go install -v ./...
 
-# RUN go build -o main .
+RUN go build -o main .
 
 EXPOSE 80
 
-CMD ["ls"]
+CMD ["./main"]
