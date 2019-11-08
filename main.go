@@ -19,13 +19,12 @@ func main() {
 	if port == "" {
 		port = *(flag.String("p", "80", "port to serve on"))
 	}
-
-	directory := flag.String("d", "./frontend/public/", "the directory of static file to host")
 	flag.Parse()
 
-	// http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(*directory))))
-	http.Handle("/", http.FileServer(http.Dir("./frontend/public/")))
+	directory := "./build"
 
-	log.Printf("Serving %s on HTTP port: %s\n", *directory, port)
+	http.Handle("/", http.FileServer(http.Dir(directory)))
+
+	log.Printf("Serving %s on HTTP port: %s\n", directory, port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
