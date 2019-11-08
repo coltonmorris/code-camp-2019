@@ -2,15 +2,18 @@ package main
 
 import "fmt"
 
-type Songs struct {
+type Song struct {
 	artist string
-	name string
-	album string
+	name   string
+	album  string
 }
 
-type Playlist []Songs
+type Playlist struct {
+	name  string
+	songs []song
+}
 
 type MusicService interface {
-	GetPlaylist() Playlist 
-	CreatePlaylist(Playlist) 
+	GetPlaylist() Playlist
+	CreatePlaylist(Playlist)
 }
