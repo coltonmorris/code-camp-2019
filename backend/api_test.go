@@ -3,11 +3,19 @@ package backend
 import (
 	"fmt"
 
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	wordGen "github.com/zhexuany/wordGenerator"
 	"testing"
 )
 
 func TestTransferPlaylist(t *testing.T) {
+	db, err := gorm.Open("sqlite3", "test.db")
+	if err != nil {
+		panic("failed to connect database")
+	}
+	defer db.Close()
+	db.AutoMigrate(&serviceTestImpl{})
 	a := newServiceTestImpl("Spotify")
 	b := newServiceTestImpl("Youtube")
 
@@ -16,26 +24,29 @@ func TestTransferPlaylist(t *testing.T) {
 
 	usr := UserImpl{}
 	fmt.Println(usr.TransferPlaylist("hip rap", pName, a, b))
+	db.Create(a)
+	db.Create(b)
 }
 
 type serviceTestImpl struct {
-	name      string
-	playlists map[string][]Song
+	gorm.Model
+	Name      string
+	Playlists map[string][]Song `gorm:"-"`
 }
 
 func newServiceTestImpl(name string) *serviceTestImpl {
 	return &serviceTestImpl{
-		name:      name,
-		playlists: map[string][]Song{},
+		Name:      name,
+		Playlists: map[string][]Song{},
 	}
 }
 
 func (this *serviceTestImpl) GetName() string {
-	return this.name
+	return this.Name
 }
 
 func (this *serviceTestImpl) GetPlaylist(pName string) ([]Song, error) {
-	songs, ok := this.playlists[pName]
+	songs, ok := this.Playlists[pName]
 	if ok {
 		return songs, nil
 	}
@@ -49,8 +60,8 @@ func (this *serviceTestImpl) CreatePlaylist(pName string) (string, error) {
 		if i != 0 {
 			createName = fmt.Sprintf("pName-%d", i)
 		}
-		if _, ok := this.playlists[createName]; !ok {
-			this.playlists[createName] = []Song{}
+		if _, ok := this.Playlists[createName]; !ok {
+			this.Playlists[createName] = []Song{}
 			return createName, nil
 		}
 		i++
@@ -63,13 +74,13 @@ func (this *serviceTestImpl) AddSongs(pName string, songs []Song) (SyncedSongs, 
 		FailedSongs:   []Song{},
 	}
 
-	_, ok := this.playlists[pName]
+	_, ok := this.Playlists[pName]
 	if !ok {
 		return SyncedSongs{}, fmt.Errorf("Playlist %s DNE", pName)
 	}
 
 	for _, song := range songs {
-		this.playlists[pName] = append(this.playlists[pName], song)
+		this.Playlists[pName] = append(this.Playlists[pName], song)
 	}
 
 	resp.AcceptedSongs = songs
@@ -78,10 +89,10 @@ func (this *serviceTestImpl) AddSongs(pName string, songs []Song) (SyncedSongs, 
 }
 
 func (this *serviceTestImpl) GenerateRandomPlaylist(pName string, songCount int) {
-	this.playlists[pName] = []Song{}
+	this.Playlists[pName] = []Song{}
 	for i := 0; i < songCount; i++ {
 		strs := wordGen.GetWords(3, 10)
-		this.playlists[pName] = append(this.playlists[pName], Song{
+		this.Playlists[pName] = append(this.Playlists[pName], Song{
 			artist: strs[0],
 			album:  strs[1],
 			name:   strs[2],
