@@ -15,4 +15,4 @@ RUN go build -o main .
 # heroku assigns this port
 EXPOSE $PORT
 
-CMD ["./main -p $PORT"]
+CMD ["./main"]
