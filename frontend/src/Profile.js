@@ -11,7 +11,7 @@ const data = { // TODO get data
     links: {
       spotify: true,
       apple: false,
-      google: true,
+      youtube: true,
     }
   }
 }
@@ -19,7 +19,7 @@ const data = { // TODO get data
 function Profile() {
   const displayLinkedAccounts = () => {
     return Object.keys(data.profile.links).map(key => {
-      return <LinkAccountButton name={key} linked={data.profile.links[key]} />
+      return <LinkAccountButton name={key} linked={data.profile.links[key]} key={key} />
     })
   }
 
@@ -28,7 +28,7 @@ function Profile() {
       <Grid>
         <span>{`${data.profile.name}'s Profile`}</span>
       </Grid>
-      <Grid>
+      <Grid className="LinkedAccountContainer">
         {displayLinkedAccounts()}
       </Grid>
       <PlaylistContainer />

@@ -41,7 +41,6 @@
 
 .ProfileContainer {
   font-size: calc(10px + 2vmin);
-  align-items: center;
 }
 
 .ProgressBarTitle {
@@ -56,6 +55,11 @@
 }
 
 .LinkAccountButton {
-  height: 60px;
-  width: 60px;
+  height: 140px;
+  width: 140px;
+}
+
+.LinkedAccountContainer {
+  flex-direction: row;
+  justify-content: space-between;
 }
