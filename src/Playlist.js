@@ -1,23 +1,45 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
+// import ListItem from '@material-ui/core/ListItem';
+import Paper from '@material-ui/core/Paper';
+import LinkAccountButton from './LinkAccountButton';
 import './App.css';
 
+const data = { // TODO get data
+  profile: {
+    name: "Brady",
+    links: {
+      spotify: true,
+      apple: false,
+      youtube: true,
+    }
+  }
+}
+
 function Playlist(props) {
+
+  const displayLinkedAccounts = () => {
+    return Object.keys(data.profile.links).map(key => {
+      return <LinkAccountButton
+        name={key}
+        linked={data.profile.links[key]}
+        key={key}
+        big={false}
+      />
+    })
+  }
+
   return (
-    <Grid className="Playlist">
-      <span className="PlaylistPart">
+    <Paper className="Playlist">
+      <span>
         {`${props.name}`}
       </span>
-      <span className="PlaylistPart">
+      <span>
         {`${props.count} songs`}
       </span>
-      <span className="PlaylistLinks">
-        <Button variant="contained">Spotify</Button>
-        <Button variant="contained">Apple</Button>
-        <Button variant="contained">Google</Button>
+      <span className="SyncPlaylistContainer">
+        {displayLinkedAccounts()}
       </span>
-    </Grid>
+    </Paper>
   )
 }
 

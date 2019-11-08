@@ -1,7 +1,7 @@
 import React from 'react';
-import './App.css';
-
+import Grid from '@material-ui/core/Grid';
 import Profile from './Profile';
+import './App.css';
 
 function App() {
   return (
@@ -9,7 +9,11 @@ function App() {
       <header className="App-header">
         SyncList.tech
       </header>
-      <Profile />
+      <div className="AppOuter">
+        <div className="AppContainer">
+          <Profile />
+        </div>
+      </div>
     </div>
   );
 }

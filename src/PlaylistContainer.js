@@ -1,5 +1,6 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
 import Playlist from './Playlist';
 import './App.css';
 
@@ -30,8 +31,13 @@ function PlaylistContainer() {
   }
 
   return (
-    <Grid>
-      {displayPlaylists()}
+    <Grid className="PlaylistContainer">
+      <div className="PlaylistList">
+        <div className="PlaylistTitle">Playlists</div>
+        <List>
+          {displayPlaylists()}
+        </List>
+      </div>
     </Grid>
   );
 }

@@ -28,7 +28,7 @@ const data = { // TODO get data
   }]
 }
 
-function Jobs() {
+function JobsContainer() {
   const displayJobs = () => {
     return data.jobs.map((job) => {
       return <ProgressBar {...job} key={job.id} />
@@ -36,12 +36,13 @@ function Jobs() {
   }
 
   return (
-    <Grid className="JobsContainer">
-      <div className="JobsTitle">Jobs</div>
-      <br />
-      {displayJobs()}
+    <Grid className="JobsOuter">
+      <Grid className="JobsContainer">
+        <div className="JobsTitle">Jobs</div>
+        {displayJobs()}
+      </Grid>
     </Grid>
   );
 }
 
-export default Jobs;
+export default JobsContainer;

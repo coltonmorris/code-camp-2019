@@ -2,8 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import './App.css';
 
-// big if true
-function LinkAccountButton(props) {
+function SyncPlaylistButton(props) {
   const getIconImage = () => {
     switch(props.name){
       case 'apple': return '/images/apple.png';
@@ -17,10 +16,10 @@ function LinkAccountButton(props) {
     <Button
       variant="contained"
       color={props.linked ? "primary" : "secondary"}
-      className={props.big ? "LinkAccountButton" : "SyncPlaylistButton"}
+      className="SyncPlaylistButton"
       style={{
         backgroundImage: `url(${getIconImage()})`,
-        minWidth: "40px"
+        backgroundSize: "140px 140px",
       }}
     >
       {""}
@@ -28,4 +27,4 @@ function LinkAccountButton(props) {
   );
 }
 
-export default LinkAccountButton;
+export default SyncPlaylistButton;

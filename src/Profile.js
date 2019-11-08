@@ -19,7 +19,12 @@ const data = { // TODO get data
 function Profile() {
   const displayLinkedAccounts = () => {
     return Object.keys(data.profile.links).map(key => {
-      return <LinkAccountButton name={key} linked={data.profile.links[key]} key={key} />
+      return <LinkAccountButton
+        name={key}
+        linked={data.profile.links[key]}
+        key={key}
+        big
+      />
     })
   }
 
@@ -31,7 +36,9 @@ function Profile() {
       <Grid className="LinkedAccountContainer">
         {displayLinkedAccounts()}
       </Grid>
+      <br />
       <PlaylistContainer />
+      <br />
       <JobsContainer />
     </Grid>
   );
