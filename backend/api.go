@@ -23,7 +23,7 @@ type Playlist struct {
 type User interface {
 	GetEmail() string
 	GetAvailableServiceAccounts() []string
-	GetServiceAccount() ServiceAccount
+	GetServiceAccount(string) ServiceAccount
 	// TODO: Add service account
 	GetAllPlaylistCounts() map[string]PlayCount
 }
