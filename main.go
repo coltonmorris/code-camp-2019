@@ -12,10 +12,15 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
-	port := flag.String("p", "80", "port to serve on")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = flag.String("p", "80", "port to serve on")
+	}
+
 	directory := flag.String("d", ".", "the directory of static file to host")
 	flag.Parse()
 
