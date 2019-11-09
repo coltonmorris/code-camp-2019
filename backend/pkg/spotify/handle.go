@@ -1,6 +1,7 @@
-package backend
+package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,13 +29,11 @@ type SyncedSongs struct {
 type ServiceAccount interface {
 	GetName() string
 	GetPlaylist(string) ([]Song, error)
-	CreatePlaylist(string) (string, error)
+	CreatePlaylist(string, string) (string, error)
 	AddSongs(string, []Song) (SyncedSongs, error)
 }
 
-type UserImpl struct{}
-
-func (user *UserImpl) TransferPlaylist(newPlaylistName, playlistName string, ogAccount, acceptingAccount ServiceAccount) (SyncedSongs, error) {
+func TransferPlaylist(newPlaylistName, playlistName string, ogAccount, acceptingAccount ServiceAccount) (SyncedSongs, error) {
 	songs, err := ogAccount.GetPlaylist(playlistName)
 	if err != nil {
 		log.WithError(err).WithFields(log.Fields{
@@ -50,7 +49,7 @@ func (user *UserImpl) TransferPlaylist(newPlaylistName, playlistName string, ogA
 		newPlaylistName = playlistName
 	}
 
-	if newPlaylistName, err = acceptingAccount.CreatePlaylist(newPlaylistName); err != nil {
+	if newPlaylistName, err = acceptingAccount.CreatePlaylist(newPlaylistName, fmt.Sprintf("Copied playlist: %s from service: %s", playlistName, ogAccount.GetName())); err != nil {
 		log.WithError(err).WithFields(log.Fields{
 			"playlistName":     playlistName,
 			"newName":          newPlaylistName,

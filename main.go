@@ -20,6 +20,7 @@ func main() {
 	flag.Parse()
 
 	http.Handle("/", http.FileServer(http.Dir(*directory)))
+	http.Handle("/spotify", handle)
 
 	log.Printf("Serving %s on HTTP port: %s\n", *directory, *port)
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
