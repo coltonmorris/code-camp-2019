@@ -1,6 +1,5 @@
 import React from 'react';
-// import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import ListItem from '@material-ui/core/ListItem';
 import LinkAccountButton from './LinkAccountButton';
 import './App.css';
 
@@ -16,30 +15,35 @@ const data = { // TODO get data
 }
 
 function Playlist(props) {
-
   const displayLinkedAccounts = () => {
     return Object.keys(data.profile.links).map(key => {
-      return <LinkAccountButton
-        name={key}
-        linked={data.profile.links[key]}
-        key={key}
-        big={false}
-      />
+      if (key !== props.currentTab) {
+        return <LinkAccountButton
+          name={key}
+          linked={data.profile.links[key]}
+          key={key}
+          big={false}
+          onClick={props.openDrawer}
+        />
+      } else { return null; }
     })
   }
 
   return (
-    <Paper className="Playlist">
-      <span>
+    <div className="Playlist">
+      <span className="rest">
         {`${props.name}`}
       </span>
-      <span>
-        {`${props.count} songs`}
+      <span className="SongCountRight">
+          {`${props.count}`}
+      </span>
+      <span className="SongCount">
+          songs
       </span>
       <span className="SyncPlaylistContainer">
         {displayLinkedAccounts()}
       </span>
-    </Paper>
+    </div>
   )
 }
 

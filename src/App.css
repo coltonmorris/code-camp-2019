@@ -3,80 +3,75 @@
   background-color: #EEEEEE;
 }
 
-.AppOuter {
-  display: flex;
-  justify-content: center;
-}
-
 .AppContainer {
   background-color: white;
   width: 800px;
-  height: calc(100vh - 75px);
+  height: calc(100vh - 110px);
+}
+
+.AppBody {
+  height: 100%;
 }
 
 .App-header {
   background-color: #282c34;
-  height: 75px;
+  height: 60px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+  font-size: calc(5px + 2vmin);
+  color: white;
+}
+
+.App-footer {
+  background-color: #282c34;
+  height: 50px;
   font-size: calc(10px + 2vmin);
   color: white;
+  text-align: center;
+  display: flex;
+  justify-content: space-evenly;
+  padding-top: 10px;
 }
 
 .App-link {
   color: #09d3ac;
 }
 
-.JobsTitle {
+.ProfileTitle {
   text-align: left;
   margin-bottom: 5px;
   font-size: calc(10px + 2vmin);
-}
-
-.JobsOuter {
-  display: flex;
-  justify-content: center;
-}
-
-.JobsContainer {
-  width: 80%;
 }
 
 .Playlist {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  font-size: calc(2vmin);
-  margin-top: 10px;
+  justify-content: flex-end;
+  font-size: calc(1.75vmin);
+  vertical-align: middle;
+  line-height: 32px;
 }
 
-.PlaylistContainer {
-  display: flex;
-  justify-content: center;
+.Playlist:hover {
+  background-color: #E8E8E8;
+  cursor: default;
 }
 
-.PlaylistList {
-  width: 80%;
-}
-
-.PlaylistTitle {
-  text-align: left;
-  margin-bottom: 5px;
-  font-size: calc(10px + 2vmin);
-}
 
 .ProfileContainer {
-  margin-top: 20px;
-  font-size: calc(10px + 2vmin);
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .ProgressBarTitle {
-  font-size: calc(2vmin);
+  font-size: calc(1.9vmin);
   text-align: left;
   padding-left: 10px;
   padding: 4px;
+  width: 100%;
 }
 
 .ProgressBar {
@@ -84,7 +79,6 @@
 }
 
 .LinkedAccountContainer {
-  margin-top: 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -97,9 +91,9 @@
 }
 
 .SyncPlaylistButton {
-  height: 40px;
-  width: 40px;
-  background-size: 40px 40px;
+  height: 32px;
+  width: 32px;
+  background-size: 32px 32px;
 }
 
 .LinkAccountButton {
@@ -110,7 +104,74 @@
 
 .SyncPlaylistContainer {
   display: flex;
+  justify-content: space-around;
+  width: 90px;
+}
+
+.GenericContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.GenericContainerBody {
+  width: 80%;
+}
+
+.scrollable {
+  overflow: scroll;
+  height: calc(100vh - 440px);
+}
+
+.threehundo {
+  height: 220px;
+}
+
+.rest {
+  width: 100%;
+  text-align: left;
+  padding-left: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.BasicPad {
+  padding-left: 15px;
+  padding-right: 10px;
+  font-color: white;
+}
+
+.SongCountRight {
+  width: 100px;
+  text-align: right;
+}
+
+.SongCount {
+  width: 100px;
+}
+
+.PlaylistName {
+  width: 100%;
+}
+
+.Progress {
+  margin-top: 10px;
+  display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
-  width: 140px;
+  justify-content: flex-end;
+}
+
+.Spinner {
+  animation-name: spin;
+  animation-duration: 1500ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }

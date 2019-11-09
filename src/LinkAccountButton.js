@@ -15,13 +15,18 @@ function LinkAccountButton(props) {
 
   return (
     <Button
-      variant="contained"
+      variant={props.big ? "contained" : "outlined"}
       color={props.linked ? "primary" : "secondary"}
       className={props.big ? "LinkAccountButton" : "SyncPlaylistButton"}
       style={{
         backgroundImage: `url(${getIconImage()})`,
-        minWidth: "40px"
+        minWidth: "32px",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        borderRadius: !props.big && "0px",
       }}
+      disabled={!props.big && (props.linked ? false : true)}
+      onClick={props.onClick}
     >
       {""}
     </Button>

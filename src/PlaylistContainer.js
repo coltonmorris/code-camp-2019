@@ -1,44 +1,69 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
 import Playlist from './Playlist';
+import Paper from '@material-ui/core/Paper';
+import List from '@material-ui/core/List';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import './App.css';
 
-const data = { // TODO get data
-  playlists: [{
-    id: 1,
-    name: 'Basic Playlist',
-    count: 20,
-  }, {
-    id: 2,
-    name: 'Baller Playlist',
-    count: 35,
-  }, {
-    id: 3,
-    name: 'Giga Playlist',
-    count: 748,
-  }]
+const mockLists = () => {
+  let results = []
+  for(let i=0;i<40;i++){
+    results.push({
+      id: i,
+      name: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+      count: Math.round(Math.random() * 100) * Math.round(Math.random() *  100)
+    })
+  }
+  return results;
 }
 
-function PlaylistContainer() {
-  const displayPlaylists = () => {
-    return data.playlists.map((list) => {
+const data = { // TODO get data
+  playlists: [
+    mockLists(),
+    mockLists(),
+    mockLists(),
+  ]
+}
+
+function PlaylistContainer(props) {
+  const [tab, setTab] = React.useState(0);
+
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setTab(newValue);
+  };
+
+  const displayPlaylists = (tab) => {
+    return data.playlists[tab].map((list) => {
       return <Playlist
         key={list.id}
+        openDrawer={props.openDrawer}
+        currentTab={props.services[tab]}
         {...list}
       />
     })
   }
 
   return (
-    <Grid className="PlaylistContainer">
-      <div className="PlaylistList">
-        <div className="PlaylistTitle">Playlists</div>
-        <List>
-          {displayPlaylists()}
-        </List>
-      </div>
-    </Grid>
+    <div>
+      <Paper>
+        <Tabs
+          value={tab}
+          onChange={handleChange}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="fullWidth"
+          centered
+        >
+          { props.services.map(s => {
+            return <Tab label={s} key={s} />
+          })}
+        </Tabs>
+      </Paper>
+      <List className="scrollable">
+        {displayPlaylists(tab)}
+      </List>
+    </div>
   );
 }
 

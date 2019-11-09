@@ -1,4 +1,4 @@
-# -------- GO STEP -----------       
+# -------- GO STEP -----------
 FROM golang:latest
 
 WORKDIR $GOPATH/src/github.com/coltonmorris/code-camp-2019
@@ -11,7 +11,7 @@ RUN go install -v ./...
 
 RUN CGO_ENABLED=0 go build -o main .
 
-# -------- JS STEP -----------       
+# -------- JS STEP -----------
 FROM node:12.10.0-alpine
 
 WORKDIR /frontend
@@ -23,6 +23,7 @@ ENV PATH /frontend/node_modules/.bin:$PATH
 COPY --from=0 /go/src/github.com/coltonmorris/code-camp-2019/package.json .
 COPY --from=0 /go/src/github.com/coltonmorris/code-camp-2019/public public/
 COPY --from=0 /go/src/github.com/coltonmorris/code-camp-2019/src src/
+COPY --from=0 /go/src/github.com/coltonmorris/code-camp-2019/package-lock.json .
 
 RUN npm install --silent
 RUN npm install react-scripts@3.2.0 -g --silent
@@ -30,7 +31,7 @@ RUN npm install react-scripts@3.2.0 -g --silent
 # build production bundle
 RUN ["npm", "run", "build"]
 
-# -------- FINAL RUN STEP -----------       
+# -------- FINAL RUN STEP -----------
 
 FROM alpine:latest
 
