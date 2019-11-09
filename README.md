@@ -18,6 +18,7 @@
 2. Give heroku the env vars:
 ```
   heroku config:set SPOTIFY_ID=client_id_here -a code-camp-2019 && \
-  heroku config:set SPOTIFY_SECRET=client_secret_here -a code-camp-2019
+  heroku config:set SPOTIFY_SECRET=client_secret_here -a code-camp-2019 && \
+  heroku config:set SPOTIFY_REDIRECT="http://synclist.tech/callback/spotify" -a code-camp-2019
 ```
 3. Ensure Redirect URIs are inputed in the dev console

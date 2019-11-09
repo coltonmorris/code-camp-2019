@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/gorilla/mux"
 	"github.com/zmb3/spotify"
 )
+
+var SpotifyRedirectURI string = "http://localhost:8080/callback/spotify"
 
 type API struct {
 	sync.RWMutex
@@ -43,17 +46,24 @@ func (this *API) LoginUser(username string) {
 }
 
 func (this *API) RegisterYoutube(user string) (string, error) {
-	ys, err := NewYoutubeService(context.Background())
-	if err != nil {
-		return "", err
-	}
+	// ys, err := NewYoutubeService(context.Background())
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	return ys.authUrl, nil
+	// return ys.authUrl, nil
+	return "", nil
 }
 
 func (this *API) RegisterSpotify(user string) string {
-	redirectURI := "http://localhost:8080/callback/spotify"
-	auth := spotify.NewAuthenticator(redirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
+	// if this env var is available, use it instead
+	redirect := os.Getenv("SPOTIFY_REDIRECT")
+	if redirect != "" {
+		SpotifyRedirectURI = redirect
+		fmt.Println("using spotify redirect: ", SpotifyRedirectURI)
+	}
+
+	auth := spotify.NewAuthenticator(SpotifyRedirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
 	return auth.AuthURL(user)
 }
 
@@ -62,7 +72,7 @@ func (this *API) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	if params["service"] == "spotify" {
-		auth := spotify.NewAuthenticator(redirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
+		auth := spotify.NewAuthenticator(SpotifyRedirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
 		st := r.FormValue("state")
 		tok, err := auth.Token(st, r)
 		if err != nil {
