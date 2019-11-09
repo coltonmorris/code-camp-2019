@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -28,12 +29,12 @@ func RunHttpServer(api *API) {
 	// This is called after a user has logged in and recieved a valid username. We do this to kick off the authentication process for a service. It returns a url
 	r.HandleFunc("/register/{user}/{service}", RegisterHandler(api))
 
-	// TODO work down from here enabling each endpoint
-	// TODO /callback/{service}/  not working
-	r.HandleFunc("/callback/{service}", AuthCallbackHandler)
+	// if the uri ends in a "/" it will not work
+	r.HandleFunc("/callback/{service}", AuthCallbackHandler(api))
 
+	// TODO work down from here enabling each endpoint
 	// The function for syncing a users playlist
-	r.HandleFunc("/sync/{user}/{playlistName}/{service_a}/{service_b}", AuthCallbackHandler)
+	r.HandleFunc("/sync/{user}/{playlistName}/{service_a}/{service_b}", AuthCallbackHandler(api))
 
 	// this root route must come AFTER all other routes to allow other requests through
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(rootDir)))
@@ -42,22 +43,6 @@ func RunHttpServer(api *API) {
 
 	log.Printf("Serving %s on HTTP port: %s\n", rootDir, port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
-}
-
-func AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	w.WriteHeader(http.StatusOK)
-
-	// token := ""
-
-	switch vars["service"] {
-	case "spotify":
-		fmt.Println("Spotify callback hit")
-	case "youtube":
-		fmt.Println("Youtube code: ", r.FormValue("code"))
-	default:
-		fmt.Println("Neither spotify or youtube was hit")
-	}
 }
 
 func LoginHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
@@ -98,10 +83,11 @@ func RegisterHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 				io.WriteString(w, "ERROR: encountered an error from RegisterYoutube")
 				return
 			}
+			fmt.Println("registered youtube: ", url)
 		default:
-			fmt.Println("unknown service")
+			fmt.Println("unknown service in auth registry")
 			w.WriteHeader(http.StatusBadRequest)
-			io.WriteString(w, "ERROR: invalid service")
+			io.WriteString(w, "ERROR - invalid service: "+service)
 			return
 		}
 
@@ -110,5 +96,43 @@ func RegisterHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 		}
 		io.WriteString(w, url)
 		return
+	}
+}
+
+func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/text")
+
+		service := mux.Vars(r)["service"]
+
+		switch service {
+		case "spotify":
+			fmt.Println("Spotify callback hit with request: ", r)
+			if err := api.SpotifyAuthCallback(r); err != nil {
+				fmt.Println("err from spotify: ", err)
+				w.WriteHeader(http.StatusForbidden)
+				io.WriteString(w, "Couldn't spotify get token")
+				return
+			}
+
+		case "youtube":
+			fmt.Println("Youtube code: ", r.FormValue("code"))
+			if err := api.YoutubeAuthCallback(r); err != nil {
+				fmt.Println("err from youtube callback: ", err)
+				w.WriteHeader(http.StatusForbidden)
+				io.WriteString(w, "Couldn't youtube get token")
+				return
+			}
+		default:
+			fmt.Println("unknown service in auth callback")
+			w.WriteHeader(http.StatusBadRequest)
+			io.WriteString(w, "ERROR - invalid service: "+service)
+			return
+		}
+
+		type response struct {
+			ok bool
+		}
+		json.NewEncoder(w).Encode(response{ok: true})
 	}
 }
