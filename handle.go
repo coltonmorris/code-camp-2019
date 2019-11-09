@@ -13,12 +13,13 @@ type Song struct {
 
 type PlayCount struct {
 	playlistName string
-	songCoung    int
+	songCount    int
 }
 
 type Playlist struct {
-	name  string
-	songs []Song
+	name      string
+	songs     []Song
+	songCount int
 }
 
 type SyncedSongs struct {

@@ -187,9 +187,7 @@ func (ys *YoutubeService) loadPlaylists(part string, maxResults int64, pageToken
 
 	for _, ele := range response.Items {
 		ps[PlaylistId(ele.Id)] = Playlist{
-			name:        ele.Snippet.Title,
-			description: ele.Snippet.Description,
-			// songs:
+			name:      ele.Snippet.Title,
 			songCount: int(ele.ContentDetails.ItemCount),
 		}
 	}
