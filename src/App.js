@@ -40,6 +40,7 @@ function App() {
 
   const doLogin = (name) => {
     setName(name);
+    window.localStorage.setItem('name', name);
     setLoggedIn(true);
   }
 
