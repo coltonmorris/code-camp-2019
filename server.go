@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -63,13 +64,21 @@ func GetPlaylistHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("User: %s is not authorized for svc %s", username, svc)
 			w.WriteHeader(http.StatusBadRequest)
 			io.WriteString(w, "Couldnt get svc")
+			return
 		}
 
-		_ = ssvc.GetPlaylists()
+		playCounts := ssvc.GetPlaylists()
 
-		api.LoginUser(username)
+		var jsonData []byte
+		jsonData, err := json.Marshal(playCounts)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			io.WriteString(w, "bad marshalling")
+			return
+		}
 
-		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonData)
 		return
 	}
 }
