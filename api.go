@@ -46,7 +46,7 @@ func (this *API) RegisterYoutube(user string) (string, error) {
 		return "", fmt.Errorf("could not get user when registering youtube")
 	}
 
-	ys, err := NewYoutubeService(context.Background(), user, api.YoutubeRedirectURI)
+	ys, err := NewYoutubeService(context.Background(), user, this.YoutubeRedirectURI)
 	if err != nil {
 		return "", err
 	}
