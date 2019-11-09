@@ -11,9 +11,13 @@ type PlayCount struct {
 	songCoung    int
 }
 
+type PlaylistId string
+type Playlists map[PlaylistId]Playlist
+
 type Playlist struct {
-	name  string
-	songs []Song
+	name      string
+	songs     []Song
+	songCount int
 }
 
 type SyncedSongs struct {
@@ -31,4 +35,3 @@ type ServiceAccount interface {
 type LameUser struct {
 	ServiceAccounts map[string]ServiceAccount
 }
-
