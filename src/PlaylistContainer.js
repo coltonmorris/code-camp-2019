@@ -20,7 +20,19 @@ const mockLists = () => {
 
 const data = { // TODO get data
   playlists: [
-    mockLists(),
+    [{
+      id: 1,
+      name: 'piano',
+      count: 186
+    }, {
+      id: 2,
+      name: 'groove',
+      count: 26
+    }, {
+      id: 3,
+      name: 'plane',
+      count: 166
+    }],
     mockLists(),
     mockLists(),
   ]
@@ -39,6 +51,10 @@ function PlaylistContainer(props) {
         key={list.id}
         openDrawer={props.openDrawer}
         currentTab={props.services[tab]}
+        user={props.name}
+        name={list.name}
+        tab={tab}
+        addJob={props.addJob}
         {...list}
       />
     })

@@ -12,7 +12,6 @@ import { register } from './api';
 
 const data = { // TODO get data
   profile: {
-    name: "Brady",
     links: [{
       name: 'spotify',
       connected: true,
@@ -65,6 +64,8 @@ function Profile(props) {
       </div>
       <GenericContainer>
         <PlaylistContainer
+          addJob={props.addJob}
+          name={props.name}
           openDrawer={props.openDrawer}
           services={data.profile.links.map((svc) => {
             return svc.name;
