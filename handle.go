@@ -26,6 +26,9 @@ type SyncedSongs struct {
 	FailedSongs   []Song
 }
 
+type PlaylistId string
+type Playlists map[PlaylistId]Playlist
+
 type ServiceAccount interface {
 	GetName() string
 	GetPlaylist(string) ([]Song, error)
