@@ -69,7 +69,7 @@ func (this *API) YoutubeAuthCallback(r *http.Request) error {
 
 	lameUser, ok := this.GetUser(user)
 	if !ok {
-		return fmt.Errorf("ERROR: could not find user: ", user)
+		return fmt.Errorf("ERROR: could not find user: %s", user)
 	}
 
 	this.Lock()

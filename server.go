@@ -135,5 +135,33 @@ func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) 
 // Uri: /sync/{user}/{playlistName}/{origin_service}/{destination_service}
 func SyncHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		user := mux.Vars(r)["user"]
+		pName := mux.Vars(r)["playlistName"]
+		osvc := mux.Vars(r)["origin_service"]
+		dsvc := mux.Vars(r)["destination_service"]
+		lameUser, ok := api.GetUser(user)
+		if !ok {
+			fmt.Printf("no user registered for user: %s", user)
+		}
+
+		ssvc, okay := lameUser.ServiceAccounts[osvc]
+		if !okay {
+			fmt.Printf("User: %s is not authorized for svc %s", user, osvc)
+			w.WriteHeader(http.StatusBadRequest)
+			io.WriteString(w, "Couldnt get svc")
+		}
+		esvc, okay := lameUser.ServiceAccounts[dsvc]
+		if !okay {
+			fmt.Printf("User: %s is not authorized for svc %s", user, dsvc)
+			w.WriteHeader(http.StatusBadRequest)
+			io.WriteString(w, "Couldnt get svc")
+		}
+
+		synced, err := TransferPlaylist(pName, pName, ssvc, esvc)
+		if err != nil {
+			fmt.Print("failed to transfer", err)
+		}
+		fmt.Println(synced)
+
 	}
 }

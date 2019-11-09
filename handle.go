@@ -13,7 +13,7 @@ func TransferPlaylist(newPlaylistName, playlistName string, ogAccount, accepting
 			"newName":          newPlaylistName,
 			"OriginalAccount":  ogAccount.GetName(),
 			"acceptingAccount": acceptingAccount.GetName(),
-		})
+		}).Warn("Failed get og playlist")
 		return SyncedSongs{}, err
 	}
 
@@ -27,7 +27,7 @@ func TransferPlaylist(newPlaylistName, playlistName string, ogAccount, accepting
 			"newName":          newPlaylistName,
 			"OriginalAccount":  ogAccount.GetName(),
 			"acceptingAccount": acceptingAccount.GetName(),
-		})
+		}).Warn("Failed create playlist")
 		return SyncedSongs{}, err
 	}
 
