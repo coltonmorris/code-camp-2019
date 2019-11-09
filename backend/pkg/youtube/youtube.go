@@ -14,23 +14,51 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
-type Playlist struct{}
-
 type YoutubeService struct {
-	authUrl string
-	service *youtube.Service
-	config  *oauth2.Config // every user will needs this config to generate their oauth2 token
-	ctx     context.Context
-	apiKey  string // typically used for non oauth2 requests
+	playlists Playlists
+	authUrl   string
+	service   *youtube.Service
+	config    *oauth2.Config // every user will needs this config to generate their oauth2 token
+	ctx       context.Context
+	apiKey    string // typically used for non oauth2 requests
 }
 
-func (ys *YoutubeService) GetPlaylist() *Playlist {
+// LoadAllPlaylists queries Youtube API for a list of all the authenticated users playlists
+func (ys *YoutubeService) LoadAllPlaylists() error {
+	// must be authenticated first
+	if ys.service == nil {
+		return fmt.Errorf("was not authenticated before LoadAllPlaylists")
+	}
+
+	// TODO eventually need to loop and use pagination... dont need to right now because most people don't have more than 50 playlists
+	playlists, err := ys.loadPlaylists("snippet,contentDetails", int64(50), "", "")
+	if err != nil {
+		return err
+	}
+
+	ys.playlists = playlists
+
+	return nil
+}
+
+func (ys *YoutubeService) GetPlaylist(playlistId string) ([]*Song, error) {
 	// must be authenticated first
 	if ys.service == nil {
 		log.Fatal("was not authenticated before getPlaylist")
 	}
 
-	return nil
+	// TODO use this for pagination
+	pageToken := ""
+
+	ytVideos, err := ys.loadPlaylistItems("snippet,contentDetails", int64(50), pageToken, playlistId, "")
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO use some fancy string parsing to turn a ytVideo into a song
+	fmt.Println("ytVideos: ", ytVideos)
+
+	return nil, nil
 }
 
 func (ys *YoutubeService) CreatePlaylist() {
@@ -94,13 +122,42 @@ func NewYoutubeService(ctx context.Context) (*YoutubeService, error) {
 	}, nil
 }
 
-func playlistsList(service *youtube.Service, part string, maxResults int64, pageToken string, playlistId string) (*youtube.PlaylistListResponse, error) {
-	// part    = flag.String("part", "snippet", "Comma-separated list of playlist resource parts that API response will include.")
-	// maxResults    = flag.Int64("maxResults", 5, "The maximum number of playlist resources to include in the API response.")
-	// pageToken    = flag.String("pageToken", "", "Token that identifies a specific page in the result set that should be returned.")
-	// playlistId       = flag.String("playlistId", "", "Retrieve information about this playlist.")
+// loadPlaylists is a single request to Youtube APIs playlist endpoint. Some times a user will have more than the maxResults allowed, so this will have to be called multiple times using the pagination parameter "pageToken"
+func (ys *YoutubeService) loadPlaylistItems(part string, maxResults int64, pageToken string, playlistId string, videoId string) ([]*YoutubeVideoDetails, error) {
+	call := ys.service.PlaylistItems.List(part)
+	call = call.MaxResults(maxResults)
+	if pageToken != "" {
+		call = call.PageToken(pageToken)
+	}
+	if playlistId != "" {
+		call = call.Id(playlistId)
+	}
+	if videoId != "" {
+		call = call.VideoId(videoId)
+	}
 
-	call := service.Playlists.List(part)
+	response, err := call.Do()
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*YoutubeVideoDetails{}
+
+	for _, ele := range response.Items {
+		ret = append(ret, &YoutubeVideoDetails{
+			Description: ele.Snippet.Description,
+			Title:       ele.Snippet.Title,
+			Note:        ele.ContentDetails.Note,
+			VideoId:     ele.ContentDetails.VideoId,
+		})
+	}
+
+	return ret, nil
+}
+
+// loadPlaylists is a single request to Youtube APIs playlist endpoint. Some times a user will have more than the maxResults allowed, so this will have to be called multiple times using the pagination parameter "pageToken"
+func (ys *YoutubeService) loadPlaylists(part string, maxResults int64, pageToken string, playlistId string) (Playlists, error) {
+	call := ys.service.Playlists.List(part)
 	call = call.Mine(true)
 	call = call.MaxResults(maxResults)
 	if pageToken != "" {
@@ -110,13 +167,28 @@ func playlistsList(service *youtube.Service, part string, maxResults int64, page
 		call = call.Id(playlistId)
 	}
 	response, err := call.Do()
+	if err != nil {
+		return nil, err
+	}
 
-	return response, err
+	var ps Playlists = make(map[PlaylistId]Playlist)
+
+	for _, ele := range response.Items {
+		ps[PlaylistId(ele.Id)] = Playlist{
+			name:        ele.Snippet.Title,
+			description: ele.Snippet.Description,
+			// songs:
+			songCount: int(ele.ContentDetails.ItemCount),
+		}
+	}
+
+	return ps, nil
 }
 
 func main() {
-	os.Setenv("YOUTUBE_API_KEY", "")
-	os.Setenv("YOUTUBE_CLIENT_SECRET_JSON", "")
+	os.Setenv("YOUTUBE_API_KEY", "AIzaSyB6zO_vHL4r3bjzjoBGEDpirBOa_ozoRkM")
+	os.Setenv("YOUTUBE_CLIENT_SECRET_JSON", "{\"web\":{\"client_id\":\"151708764487-rp0lbvppvfudv9p24miqv6lm6jf2o3kt.apps.googleusercontent.com\",\"project_id\":\"coce-camp-2019\",\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"token_uri\":\"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"client_secret\":\"qR-UNuoMgVcdxFkR4njlB9PZ\",\"redirect_uris\":[\"http://synclist.tech/youtube_callback\",\"http://localhost:8080/youtube_callback\",\"http://www.synclist.tech/youtube_callback\"],\"javascript_origins\":[\"http://synclist.tech\",\"http://www.synclist.tech\",\"http://localhost:8080\"]}}")
+
 	ys, err := NewYoutubeService(context.Background())
 	if err != nil {
 		log.Fatal(err)
@@ -134,16 +206,12 @@ func main() {
 
 		ys.Authenticate(text)
 
-		res, err := playlistsList(ys.service, "snippet,contentDetails", int64(5), "", "")
-		if err != nil {
+		if err := ys.LoadAllPlaylists(); err != nil {
 			log.Fatal(err)
 		}
 
-		for _, playlist := range res.Items {
-			playlistId := playlist.Id
-			playlistTitle := playlist.Snippet.Title
-
-			fmt.Println(playlistId, ": ", playlistTitle)
+		for id, playlist := range ys.playlists {
+			fmt.Println(id, ": ", playlist)
 		}
 	}
 }
