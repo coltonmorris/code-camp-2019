@@ -1,31 +1,18 @@
-/*
-Usage:
-	-p="8100": port to serve on
-	-d=".":    the directory of static files to host
-Navigating to http://localhost:8100 will display the index.html or directory
-listing file.
-*/
 package main
 
 import (
-	"flag"
-	"log"
-	"net/http"
 	"os"
 )
 
+func init() {
+	os.Setenv("SPOTIFY_ID", "462eace056d94eaaa00f678b93d9bd0d")
+	os.Setenv("SPOTIFY_SECRET", "4b6e16b7fa2349938b9f58f1c685b269")
+}
+
 func main() {
-	// heroku creates this env var automagically
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = *(flag.String("p", "80", "port to serve on"))
+	api := &API{
+		Users: make(map[string]*LameUser, 0),
 	}
-	flag.Parse()
 
-	directory := "./build"
-
-	http.Handle("/", http.FileServer(http.Dir(directory)))
-
-	log.Printf("Serving %s on HTTP port: %s\n", directory, port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	RunHttpServer(api)
 }
