@@ -12,3 +12,5 @@ const promiseWrapper = (url) => {
 export const login = (name) => promiseWrapper(`http://${window.location.host}/login/${name}`);
 
 export const register = (name, service) => promiseWrapper(`http://${window.location.host}/register/${name}/${service}`);
+
+export const sync = (name, playlist, from, to) => promiseWrapper(`http://${window.location.host}/sync/${name}/${playlist}/${from}/${to}`)

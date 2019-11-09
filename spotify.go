@@ -48,6 +48,17 @@ func (this *SpotifyUser) Initialize() error {
 	return nil
 }
 
+func (this *SpotifyUser) GetPlaylists() []PlayCount {
+	resp := make([]PlayCount, 0)
+	for key, value := range this.Playlists {
+		resp = append(resp, PlayCount{
+			PlaylistName: key,
+			SongCount:    value.TrackCount,
+		})
+	}
+	return resp
+}
+
 func (this *SpotifyUser) GetName() string {
 	return "Spotify"
 }

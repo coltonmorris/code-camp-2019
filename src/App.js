@@ -23,6 +23,11 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [name, setName] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [jobs, setJobs] = useState([]);
+
+  const addJob = (job) => {
+    setJobs([job, ...jobs]);
+  }
 
   const displayFooter = () => {
     return (
@@ -44,6 +49,12 @@ function App() {
     setLoggedIn(true);
   }
 
+  const logout = () => {
+    window.localStorage.clear();
+    setName('');
+    setLoggedIn(false);
+  }
+
   return (
     <ThemeProvider theme={outerTheme}>
       <div className="App">
@@ -61,7 +72,19 @@ function App() {
             </Button>
           </span>
           <span>SyncList.tech</span>
-          <span className="rest">
+          <span className="rest"></span>
+          <span className="BasicPad">
+            <Button
+              variant="outlined"
+              color="secondary"
+              style={{
+                minWidth: "30px",
+                padding: "6px"
+              }}
+              onClick={() => logout()}
+            >
+              Logout
+            </Button>
           </span>
         </header>
         {
@@ -70,7 +93,7 @@ function App() {
             <div className="GenericContainer">
               <div className="AppContainer">
                 <div className="AppBody">
-                  <Profile openDrawer={() => setDrawerOpen(true)} name={name} />
+                  <Profile openDrawer={() => setDrawerOpen(true)} name={name} addJob={addJob} />
                 </div>
               </div>
             </div>
@@ -83,7 +106,7 @@ function App() {
             >
               { displayFooter() }
               <GenericContainer>
-                <JobsContainer />
+                <JobsContainer jobs={jobs} />
               </GenericContainer>
             </Drawer>
             { drawerOpen ? "" : displayFooter() }
