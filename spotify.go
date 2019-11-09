@@ -13,14 +13,12 @@ type sPlaylist struct {
 
 type SpotifyUser struct {
 	ID        string
-	token     string
 	client    *spotify.Client
 	Playlists map[string]sPlaylist
 }
 
-func NewSpotifyUser(t string, c *spotify.Client) *SpotifyUser {
+func NewSpotifyUser(c *spotify.Client) *SpotifyUser {
 	sUser := &SpotifyUser{
-		token:     t,
 		client:    c,
 		Playlists: make(map[string]sPlaylist),
 	}
