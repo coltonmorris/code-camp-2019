@@ -21,7 +21,18 @@ type YoutubeService struct {
 	apiKey    string // typically used for non oauth2 requests
 }
 
-func NewYoutubeService(ctx context.Context, user string) (*YoutubeService, error) {
+func (ys *YoutubeService) GetPlaylists() []PlayCount {
+	resp := make([]PlayCount, 0)
+	for _, value := range ys.playlists {
+		resp = append(resp, PlayCount{
+			PlaylistName: value.name,
+			SongCount:    uint(value.songCount),
+		})
+	}
+	return resp
+}
+
+func NewYoutubeService(ctx context.Context, user string, redirectUrl string) (*YoutubeService, error) {
 	// TODO move env vars to main.go
 	apiKey := os.Getenv("YOUTUBE_API_KEY")
 	if apiKey == "" {
@@ -51,7 +62,7 @@ func NewYoutubeService(ctx context.Context, user string) (*YoutubeService, error
 		return nil, err
 	}
 
-	config.RedirectURL = "http://localhost:8080/callback/youtube"
+	config.RedirectURL = redirectUrl
 
 	return &YoutubeService{
 		authUrl: config.AuthCodeURL(user),

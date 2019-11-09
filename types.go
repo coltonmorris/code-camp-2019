@@ -7,8 +7,8 @@ type Song struct {
 }
 
 type PlayCount struct {
-	playlistName string
-	songCoung    int
+	PlaylistName string
+	SongCount    uint
 }
 
 type PlaylistId string
@@ -27,6 +27,7 @@ type SyncedSongs struct {
 
 type ServiceAccount interface {
 	GetName() string
+	GetPlaylists() []PlayCount
 	GetPlaylist(string) ([]Song, error)
 	CreatePlaylist(string, string) (string, error)
 	AddSongs(string, []Song) (SyncedSongs, error)
