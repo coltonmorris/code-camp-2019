@@ -125,9 +125,10 @@ func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
+		redirectUrl := "http://" + r.Host
+		fmt.Println("reidrectUrl: ", redirectUrl)
 
-		http.Redirect(w, r, "http://"+r.Host+r.URL.String(), http.StatusMovedPermanently)
+		http.Redirect(w, r, redirectUrl, http.StatusMovedPermanently)
 	}
 }
 
