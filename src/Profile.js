@@ -27,7 +27,6 @@ const data = { // TODO get data
 }
 
 function Profile(props) {
-  console.log('profile', props);
   const displayLinkedAccounts = () => {
     return data.profile.links.map(service => {
       return <LinkAccountButton

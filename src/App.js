@@ -44,6 +44,12 @@ function App() {
     setLoggedIn(true);
   }
 
+  const logout = () => {
+    window.localStorage.clear();
+    setName('');
+    setLoggedIn(false);
+  }
+
   return (
     <ThemeProvider theme={outerTheme}>
       <div className="App">
@@ -61,7 +67,19 @@ function App() {
             </Button>
           </span>
           <span>SyncList.tech</span>
-          <span className="rest">
+          <span className="rest"></span>
+          <span className="BasicPad">
+            <Button
+              variant="outlined"
+              color="secondary"
+              style={{
+                minWidth: "30px",
+                padding: "6px"
+              }}
+              onClick={() => logout()}
+            >
+              Logout
+            </Button>
           </span>
         </header>
         {
