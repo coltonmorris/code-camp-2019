@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -37,26 +39,47 @@ func (this *API) LoginUser(username string) {
 }
 
 func (this *API) RegisterYoutube(user string) (string, error) {
-	return "", nil
+	this.LoginUser(user)
+	lameUser, ok := this.GetUser(user)
+	if !ok {
+		return "", fmt.Errorf("could not get user when registering youtube")
+	}
 
-	// TODO uncomment when blake pushes.
-	// lameUser, exists := this.GetUser(user)
-	// if exists == false {
-	// 	return "", fmt.Errorf("user does not exist")
-	// }
+	ys, err := NewYoutubeService(context.Background(), user)
+	if err != nil {
+		return "", err
+	}
 
-	// TODO Add user to NewYoutubeService. Also move env vars to main.go
-	// ys, err := NewYoutubeService(context.Background(), user)
-	// if err != nil {
-	// 	return "", err
-	// }
+	// add youtube service to user
+	this.Lock()
+	lameUser.ServiceAccounts["youtube"] = ys
+	this.Unlock()
 
-	// // add youtube service to user
-	// this.Lock()
-	// lameUser.ServiceAccounts["youtube"] = ys
-	// this.Unlock()
+	return ys.authUrl, nil
+}
 
-	// return ys.authUrl, nil
+func (this *API) YoutubeAuthCallback(r *http.Request) error {
+	code := r.FormValue("code")
+	user := r.FormValue("state")
+
+	fmt.Println("youtube callback data: ")
+	fmt.Println("code: ", code)
+	fmt.Println("user: ", user)
+
+	lameUser, ok := this.GetUser(user)
+	if !ok {
+		return fmt.Errorf("ERROR: could not find user: ", user)
+	}
+
+	this.Lock()
+	ys := lameUser.ServiceAccounts["youtube"].(*YoutubeService)
+	if err := ys.Authenticate(code); err != nil {
+		this.Unlock()
+		return err
+	}
+	this.Unlock()
+
+	return nil
 }
 
 func (this *API) RegisterSpotify(user string) string {

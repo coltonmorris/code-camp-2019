@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"golang.org/x/oauth2"
@@ -20,6 +19,47 @@ type YoutubeService struct {
 	config    *oauth2.Config // every user will needs this config to generate their oauth2 token
 	ctx       context.Context
 	apiKey    string // typically used for non oauth2 requests
+}
+
+func NewYoutubeService(ctx context.Context, user string) (*YoutubeService, error) {
+	// TODO move env vars to main.go
+	apiKey := os.Getenv("YOUTUBE_API_KEY")
+	if apiKey == "" {
+		return nil, fmt.Errorf("the env var YOUTUBE_API_KEY must exist")
+	}
+
+	secretJson := os.Getenv("YOUTUBE_CLIENT_SECRET_JSON")
+	if secretJson == "" {
+		return nil, fmt.Errorf("the env var YOUTUBE_CLIENT_SECRET_JSON must exist")
+	}
+
+	var jsonMap map[string]interface{}
+	secretBytes := []byte(secretJson)
+
+	if err := json.Unmarshal(secretBytes, &jsonMap); err != nil {
+		return nil, fmt.Errorf("the env var YOUTUBE_CLIENT_SECRET_JSON was invalid json: %v", err)
+	}
+
+	scopes := []string{
+		youtube.YoutubeScope,
+		youtube.YoutubeUploadScope,
+		youtube.YoutubeForceSslScope,
+	}
+
+	config, err := google.ConfigFromJSON(secretBytes, scopes...)
+	if err != nil {
+		return nil, err
+	}
+
+	config.RedirectURL = "http://localhost:8080/callback/youtube"
+
+	return &YoutubeService{
+		authUrl: config.AuthCodeURL(user),
+		service: nil,
+		config:  config,
+		ctx:     ctx,
+		apiKey:  apiKey,
+	}, nil
 }
 
 // LoadAllPlaylists queries Youtube API for a list of all the authenticated users playlists
@@ -82,57 +122,24 @@ func (ys *YoutubeService) CreatePlaylist(pName, desc string) (string, error) {
 }
 
 // Authenticate takes in the code from the redirect url and turns it into a longer living token. The code will be in the http.Request.FormValue("code"). Be sure to validate that FormValue("state") exists for security reasons...
-func (ys *YoutubeService) Authenticate(code string) {
+func (ys *YoutubeService) Authenticate(code string) error {
 	token, err := ys.config.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	client := ys.config.Client(oauth2.NoContext, token)
 	ys.service, err = youtube.New(client)
 	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func NewYoutubeService(ctx context.Context) (*YoutubeService, error) {
-	apiKey := os.Getenv("YOUTUBE_API_KEY")
-	if apiKey == "" {
-		return nil, fmt.Errorf("the env var YOUTUBE_API_KEY must exist")
+		return err
 	}
 
-	secretJson := os.Getenv("YOUTUBE_CLIENT_SECRET_JSON")
-	if secretJson == "" {
-		return nil, fmt.Errorf("the env var YOUTUBE_CLIENT_SECRET_JSON must exist")
+	if err := ys.LoadAllPlaylists(); err != nil {
+		fmt.Print("ERROR LOADING")
+		return err
 	}
 
-	var jsonMap map[string]interface{}
-	secretBytes := []byte(secretJson)
-
-	if err := json.Unmarshal(secretBytes, &jsonMap); err != nil {
-		return nil, fmt.Errorf("the env var YOUTUBE_CLIENT_SECRET_JSON was invalid json: %v", err)
-	}
-
-	scopes := []string{
-		youtube.YoutubeScope,
-		youtube.YoutubeUploadScope,
-		youtube.YoutubeForceSslScope,
-	}
-
-	config, err := google.ConfigFromJSON(secretBytes, scopes...)
-	if err != nil {
-		return nil, err
-	}
-
-	config.RedirectURL = "http://localhost:8080/callback/youtube"
-
-	return &YoutubeService{
-		authUrl: config.AuthCodeURL("state"),
-		service: nil,
-		config:  config,
-		ctx:     ctx,
-		apiKey:  apiKey,
-	}, nil
+	return nil
 }
 
 // loadPlaylists is a single request to Youtube APIs playlist endpoint. Some times a user will have more than the maxResults allowed, so this will have to be called multiple times using the pagination parameter "pageToken"
@@ -248,21 +255,6 @@ func (ys *YoutubeService) AddSongs(pName string, songs []Song) (SyncedSongs, err
 	return finalres, nil
 }
 
-func (this *YoutubeService) completeAuth(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println(r.ParseForm())
-	code := r.FormValue("code")
-	fmt.Println(r.FormValue("state"))
-
-	this.Authenticate(code)
-
-	fmt.Print(this.CreatePlaylist("Testin123", ""))
-	if err := this.LoadAllPlaylists(); err != nil {
-		fmt.Print("ERROR LOADING")
-		log.Fatal(err)
-	}
-	for id, playlist := range this.playlists {
-		fmt.Println(id, ": ", playlist)
-		fmt.Println(this.GetPlaylist(string(id)))
-	}
+func (ys *YoutubeService) GetName() string {
+	return "Youtube"
 }

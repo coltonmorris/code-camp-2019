@@ -27,10 +27,9 @@ func RunHttpServer(api *API) {
 	r.HandleFunc("/login/{user}", LoginHandler(api))
 
 	// This is called after a user has logged in and recieved a valid username. We do this to kick off the authentication process for a service. It returns a url
-	// TODO finish youtube
 	r.HandleFunc("/register/{user}/{service}", RegisterHandler(api))
 
-	// TODO /callback/{service}/  not working
+	// if the uri ends in a "/" it will not work
 	r.HandleFunc("/callback/{service}", AuthCallbackHandler(api))
 
 	// TODO work down from here enabling each endpoint
@@ -84,6 +83,7 @@ func RegisterHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 				io.WriteString(w, "ERROR: encountered an error from RegisterYoutube")
 				return
 			}
+			fmt.Println("registered youtube: ", url)
 		default:
 			fmt.Println("unknown service in auth registry")
 			w.WriteHeader(http.StatusBadRequest)
@@ -103,17 +103,11 @@ func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/text")
 
-		vars := mux.Vars(r)
-
-		service := vars["service"]
-
-		// token := r.FormValue
-		// state := r.FormValue("state")
-		// var err error
+		service := mux.Vars(r)["service"]
 
 		switch service {
 		case "spotify":
-			fmt.Println("Spotify callback hit")
+			fmt.Println("Spotify callback hit with request: ", r)
 			if err := api.SpotifyAuthCallback(r); err != nil {
 				fmt.Println("err from spotify: ", err)
 				w.WriteHeader(http.StatusForbidden)
@@ -123,6 +117,12 @@ func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) 
 
 		case "youtube":
 			fmt.Println("Youtube code: ", r.FormValue("code"))
+			if err := api.YoutubeAuthCallback(r); err != nil {
+				fmt.Println("err from youtube callback: ", err)
+				w.WriteHeader(http.StatusForbidden)
+				io.WriteString(w, "Couldn't youtube get token")
+				return
+			}
 		default:
 			fmt.Println("unknown service in auth callback")
 			w.WriteHeader(http.StatusBadRequest)
