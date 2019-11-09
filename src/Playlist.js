@@ -1,5 +1,4 @@
 import React from 'react';
-import ListItem from '@material-ui/core/ListItem';
 import LinkAccountButton from './LinkAccountButton';
 import './App.css';
 

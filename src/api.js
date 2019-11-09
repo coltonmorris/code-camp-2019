@@ -9,4 +9,6 @@ const promiseWrapper = (url) => {
   })
 }
 
-export const authenticateApp = (url) => promiseWrapper(url)
+export const login = (name) => promiseWrapper(`http://${window.location.host}/login/${name}`);
+
+export const register = (name, service) => promiseWrapper(`http://${window.location.host}/register/${name}/${service}`);
