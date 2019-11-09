@@ -8,23 +8,19 @@ import './App.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { authenticateApp } from './api';
+import { register } from './api';
 
 const data = { // TODO get data
   profile: {
     name: "Brady",
     links: [{
       name: 'spotify',
-      requestRedirect: "https://jsonplaceholder.typicode.com/users",
       connected: true,
     }, {
       name: 'apple',
-      requestRedirect: "https://jsonplaceholder.typicode.com/users",
       connected: false,
     }, {
       name: 'youtube',
-      // requestRedirect: "https://jsonplaceholder.typicode.com/users",
-      requestRedirect: "https://google.com",
       connected: true,
     }]
   }
@@ -38,18 +34,18 @@ function Profile(props) {
         linked={service.connected}
         key={service.name}
         big
-        onClick={() => authenticate(service.requestRedirect)}
+        onClick={() => authenticate(props.name, service.name)}
       />
     })
   }
 
-  const authenticate = async (redirect) => {
+  const authenticate = async () => {
     try {
       // get the redirect url
-      const url = await authenticateApp(redirect);
-      const fakeUrl = "http://www.w3schools.com" // TODO
+      const url = await register();
+      console.log('url', url);
       // navigate to the redirect url to finish logging  in
-      window.location = fakeUrl;
+      window.location = url;
       // the page will navigate back after authentication
     } catch (err) {
       console.error('Expected to receive a redirect URL.', err);

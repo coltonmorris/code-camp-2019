@@ -20,7 +20,8 @@ const outerTheme = createMuiTheme({
 });
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [name, setName] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const displayFooter = () => {
@@ -57,31 +58,31 @@ function App() {
           <span className="rest">
           </span>
         </header>
-        <div className="GenericContainer">
-          <div className="AppContainer">
-            <div className="AppBody">
-              {
-                loggedIn ?
-                  <Profile openDrawer={() => setDrawerOpen(true)} /> :
-                  <LoginPage login={setLoggedIn} />
-              }
+        {
+          loggedIn ?
+          (<div>
+            <div className="GenericContainer">
+              <div className="AppContainer">
+                <div className="AppBody">
+                  <Profile openDrawer={() => setDrawerOpen(true)} name={name} />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <Drawer
-          anchor="bottom"
-          variant="temporary"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-        >
-          { displayFooter() }
-          <GenericContainer>
-            <JobsContainer />
-          </GenericContainer>
-        </Drawer>
-
-        { drawerOpen ? "" : displayFooter() }
+            <Drawer
+              anchor="bottom"
+              variant="temporary"
+              open={drawerOpen}
+              onClose={() => setDrawerOpen(false)}
+            >
+              { displayFooter() }
+              <GenericContainer>
+                <JobsContainer />
+              </GenericContainer>
+            </Drawer>
+            { drawerOpen ? "" : displayFooter() }
+          </div>) : <LoginPage loginSuccess={setLoggedIn} />
+        }
       </div>
     </ThemeProvider>
   );
