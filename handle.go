@@ -5,34 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Song struct {
-	Artist string
-	Album  string
-	Name   string
-}
-
-type PlayCount struct {
-	playlistName string
-	songCoung    int
-}
-
-type Playlist struct {
-	name  string
-	songs []Song
-}
-
-type SyncedSongs struct {
-	AcceptedSongs []Song
-	FailedSongs   []Song
-}
-
-type ServiceAccount interface {
-	GetName() string
-	GetPlaylist(string) ([]Song, error)
-	CreatePlaylist(string, string) (string, error)
-	AddSongs(string, []Song) (SyncedSongs, error)
-}
-
 func TransferPlaylist(newPlaylistName, playlistName string, ogAccount, acceptingAccount ServiceAccount) (SyncedSongs, error) {
 	songs, err := ogAccount.GetPlaylist(playlistName)
 	if err != nil {

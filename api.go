@@ -1,26 +1,19 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	"sync"
 
-	"github.com/gorilla/mux"
 	"github.com/zmb3/spotify"
 )
 
-var SpotifyRedirectURI string = "http://localhost:8080/callback/spotify"
-
 type API struct {
 	sync.RWMutex
-	Users map[string]*LameUser
-}
-
-type LameUser struct {
-	ServiceAccounts map[string]ServiceAccount
+	Users              map[string]*LameUser
+	SpotifyRedirectURI string
+	YoutubeRedirectURI string
 }
 
 func (this *API) GetUser(username string) (*LameUser, bool) {
@@ -47,48 +40,71 @@ func (this *API) LoginUser(username string) {
 }
 
 func (this *API) RegisterYoutube(user string) (string, error) {
-	// ys, err := NewYoutubeService(context.Background())
-	// if err != nil {
-	// 	return "", err
-	// }
+	this.LoginUser(user)
+	lameUser, ok := this.GetUser(user)
+	if !ok {
+		return "", fmt.Errorf("could not get user when registering youtube")
+	}
 
-	// return ys.authUrl, nil
-	return "", nil
+	ys, err := NewYoutubeService(context.Background(), user)
+	if err != nil {
+		return "", err
+	}
+
+	// add youtube service to user
+	this.Lock()
+	lameUser.ServiceAccounts["youtube"] = ys
+	this.Unlock()
+
+	return ys.authUrl, nil
+}
+
+func (this *API) YoutubeAuthCallback(r *http.Request) error {
+	code := r.FormValue("code")
+	user := r.FormValue("state")
+
+	fmt.Println("youtube callback data: ")
+	fmt.Println("code: ", code)
+	fmt.Println("user: ", user)
+
+	lameUser, ok := this.GetUser(user)
+	if !ok {
+		return fmt.Errorf("ERROR: could not find user: ", user)
+	}
+
+	this.Lock()
+	ys := lameUser.ServiceAccounts["youtube"].(*YoutubeService)
+	if err := ys.Authenticate(code); err != nil {
+		this.Unlock()
+		return err
+	}
+	this.Unlock()
+
+	return nil
 }
 
 func (this *API) RegisterSpotify(user string) string {
-	// if this env var is available, use it instead
-	redirect := os.Getenv("SPOTIFY_REDIRECT")
-	if redirect != "" {
-		SpotifyRedirectURI = redirect
-		fmt.Println("using spotify redirect: ", SpotifyRedirectURI)
-	}
-
-	auth := spotify.NewAuthenticator(SpotifyRedirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
+	auth := spotify.NewAuthenticator(this.SpotifyRedirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
 	return auth.AuthURL(user)
 }
 
-func (this *API) callbackHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
+func (this *API) SpotifyAuthCallback(r *http.Request) error {
+	auth := spotify.NewAuthenticator(this.SpotifyRedirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
 
-	if params["service"] == "spotify" {
-		auth := spotify.NewAuthenticator(SpotifyRedirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate, spotify.ScopePlaylistModifyPrivate, spotify.ScopePlaylistModifyPublic)
-		st := r.FormValue("state")
-		tok, err := auth.Token(st, r)
-		if err != nil {
-			http.Error(w, "Couldn't get token", http.StatusForbidden)
-			log.Fatal(err)
-		}
-		client := auth.NewClient(tok)
-		this.Users[st] = &LameUser{
-			ServiceAccounts: make(map[string]ServiceAccount),
-		}
-		this.Users[st].ServiceAccounts["spotify"] = NewSpotifyUser(&client)
+	// we save our user in this parameter
+	user := r.FormValue("state")
+	tok, err := auth.Token(user, r)
+	if err != nil {
+		return err
 	}
 
-	type response struct {
-		ok bool
-	}
-	json.NewEncoder(w).Encode(response{ok: true})
+	client := auth.NewClient(tok)
+
+	this.LoginUser(user)
+
+	this.Lock()
+	this.Users[user].ServiceAccounts["spotify"] = NewSpotifyUser(&client)
+	this.Unlock()
+
+	return nil
 }
