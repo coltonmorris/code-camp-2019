@@ -60,8 +60,6 @@ func LoginHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 
 func RegisterHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/text")
-
 		vars := mux.Vars(r)
 
 		username := vars["user"]
@@ -101,8 +99,6 @@ func RegisterHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 
 func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/text")
-
 		service := mux.Vars(r)["service"]
 
 		switch service {
@@ -130,10 +126,7 @@ func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		type response struct {
-			ok bool
-		}
-		json.NewEncoder(w).Encode(response{ok: true})
+		w.WriteHeader(http.StatusOK)
 
 		http.Redirect(w, r, "http://"+r.Host+r.URL.String(), http.StatusMovedPermanently)
 	}
