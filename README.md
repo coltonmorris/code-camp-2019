@@ -8,7 +8,8 @@
 2. Give heroku the env var (note: The `YOUTUBE_CLIENT_SECRET_JSON` env var will just be stringified json`):
 ```
   heroku config:set YOUTUBE_API_KEY=api_key_here -a code-camp-2019 && \
-  heroku config:set YOUTUBE_CLIENT_SECRET_JSON=client_secret_json_file_contents_here -a code-camp-2019
+  heroku config:set YOUTUBE_CLIENT_SECRET_JSON=client_secret_json_file_contents_here -a code-camp-2019 && \
+  heroku config:set YOUTUBE_REDIRECT="http://synclist.tech/callback/youtube" -a code-camp-2019
 ```
 3. Ensure Redirect URIs are inputed in the dev console
 
