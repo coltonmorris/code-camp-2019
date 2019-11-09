@@ -46,7 +46,7 @@ func main() {
 	// use the client to make calls that require authorization
 	sUser := NewSpotifyUser("bob", client)
 
-	syncedSongs, err := TransferPlaylist("C0d3 k4Mp", "bob", sUser, sUser)
+	syncedSongs, err := TransferPlaylist("C0d3 k4Mp with condor", "weeb shit", sUser, sUser)
 	if err != nil {
 		fmt.Print(err)
 		return

@@ -119,8 +119,11 @@ func (this *SpotifyUser) AddSongs(pName string, songs []Song) (SyncedSongs, erro
 	}
 	ids := make([]spotify.ID, 0)
 	for _, song := range songs {
-		SplitArtist := strings.Replace(song.Artist, ",", " OR ")
-		sResult, err := this.client.Search(fmt.Sprintf("artist:%s album:%s track:%s", splitArtist, song.Album, song.Name), spotify.SearchTypeTrack)
+		splitArtist := strings.Split(song.Artist, ",")
+		a, b, c := splitArtist[0], song.Album, song.Name
+		sQuery := fmt.Sprintf("artist:%s album:%s track:%s", a, b, c)
+		//fmt.Println(sQuery)
+		sResult, err := this.client.Search(sQuery, spotify.SearchTypeTrack)
 		if err != nil {
 			return SyncedSongs{}, err
 		}
@@ -130,18 +133,19 @@ func (this *SpotifyUser) AddSongs(pName string, songs []Song) (SyncedSongs, erro
 			if i == 0 {
 				ids = append(ids, track.ID)
 			} else {
-				fmt.Printf("Extra songs found for song: %v EXTRA SONG ID: %s EXTRA SONG NAME: %s \n", song, track.ID, track.Name)
 			}
 		}
 		if added {
 			resp.AcceptedSongs = append(resp.AcceptedSongs, song)
 		} else {
+			fmt.Printf("\n Failed to get song using query: %s", sQuery)
+			fmt.Printf("\n Full artist: %s", song.Artist)
 			resp.FailedSongs = append(resp.FailedSongs, song)
 		}
 	}
 
 	i := 99
-	cnt := len(songs)
+	cnt := len(ids)
 	for {
 		if cnt < 99 {
 			_, err := this.client.AddTracksToPlaylist(spotify.ID(this.Playlists[pName].Id), ids...)
