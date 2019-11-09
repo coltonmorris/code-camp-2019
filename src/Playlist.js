@@ -37,15 +37,13 @@ function Playlist(props) {
 
   const displayLinkedAccounts = () => {
     return Object.keys(data.profile.links).map(key => {
-      if (key !== props.currentTab) {
-        return <LinkAccountButton
-          name={key}
-          linked={data.profile.links[key]}
-          key={key}
-          big={false}
-          onClick={() => doSync(key)}
-        />
-      } else { return null; }
+      return <LinkAccountButton
+        name={key}
+        linked={data.profile.links[key]}
+        key={key}
+        big={false}
+        onClick={() => doSync(key)}
+      />
     })
   }
 
