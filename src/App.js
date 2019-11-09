@@ -38,6 +38,11 @@ function App() {
     );
   }
 
+  const doLogin = (name) => {
+    setName(name);
+    setLoggedIn(true);
+  }
+
   return (
     <ThemeProvider theme={outerTheme}>
       <div className="App">
@@ -81,7 +86,7 @@ function App() {
               </GenericContainer>
             </Drawer>
             { drawerOpen ? "" : displayFooter() }
-          </div>) : <LoginPage loginSuccess={setLoggedIn} />
+          </div>) : <LoginPage loginSuccess={doLogin} />
         }
       </div>
     </ThemeProvider>

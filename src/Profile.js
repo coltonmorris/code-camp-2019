@@ -27,6 +27,7 @@ const data = { // TODO get data
 }
 
 function Profile(props) {
+  console.log('profile', props);
   const displayLinkedAccounts = () => {
     return data.profile.links.map(service => {
       return <LinkAccountButton
@@ -39,13 +40,12 @@ function Profile(props) {
     })
   }
 
-  const authenticate = async () => {
+  const authenticate = async (name, service) => {
     try {
       // get the redirect url
-      const url = await register();
-      console.log('url', url);
+      const res = await register(name, service);
       // navigate to the redirect url to finish logging  in
-      window.location = url;
+      window.location = res.data;
       // the page will navigate back after authentication
     } catch (err) {
       console.error('Expected to receive a redirect URL.', err);

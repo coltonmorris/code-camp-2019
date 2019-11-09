@@ -13,9 +13,8 @@ function LoginPage(props) {
   const doLogin = async () => {
     setLoading(true);
     try {
-      const res = await login(name);
-      console.log('got login', res);
-      props.loginSuccess(true);
+      await login(name);
+      props.loginSuccess(name);
     } catch (err) {
       console.error('Failed to log in. ', err);
       toast.error(`Failed to log in. ${err}`);
