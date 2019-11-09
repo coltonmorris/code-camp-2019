@@ -34,7 +34,7 @@ func RunHttpServer(api *API) {
 
 	// TODO work down from here enabling each endpoint
 	// The function for syncing a users playlist
-	r.HandleFunc("/sync/{user}/{playlistName}/{service_a}/{service_b}", AuthCallbackHandler(api))
+	r.HandleFunc("/sync/{user}/{playlistName}/{origin_service}/{destination_service}", SyncHandler(api))
 
 	// this root route must come AFTER all other routes to allow other requests through
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(rootDir)))
@@ -134,5 +134,11 @@ func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) 
 			ok bool
 		}
 		json.NewEncoder(w).Encode(response{ok: true})
+	}
+}
+
+// Uri: /sync/{user}/{playlistName}/{origin_service}/{destination_service}
+func SyncHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 	}
 }

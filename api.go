@@ -13,6 +13,7 @@ type API struct {
 	sync.RWMutex
 	Users              map[string]*LameUser
 	SpotifyRedirectURI string
+	YoutubeRedirectURI string
 }
 
 func (this *API) GetUser(username string) (*LameUser, bool) {
