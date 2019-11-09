@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.com/coltonmorris/code-camp-2019.svg?branch=master)](https://travis-ci.com/coltonmorris/code-camp-2019)
 # PAWG CHAMPS
 
+'{\"web\":{\"client_id\":\"612720349908-4qpltha782sgpooira264m51smkpqmr1.apps.googleusercontent.com\",\"project_id\":\"synclist-blake\",\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"token_uri\":\"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"client_secret\":\"EezHkcB0gFrycMJe0Vl7tn_4\",\"redirect_uris\":[\"http://synclist.tech/callback/youtube\",\"http://localhost:8080/callback/youtube\"],\"javascript_origins\":[\"http://synclist.tech\",\"http://localhost:8080\"]}}'
 
 
 ## Youtube Setup
