@@ -21,6 +21,17 @@ type YoutubeService struct {
 	apiKey    string // typically used for non oauth2 requests
 }
 
+func (ys *YoutubeService) GetPlaylists() []PlayCount {
+	resp := make([]PlayCount, 0)
+	for _, value := range ys.playlists {
+		resp = append(resp, PlayCount{
+			PlaylistName: value.name,
+			SongCount:    uint(value.songCount),
+		})
+	}
+	return resp
+}
+
 func NewYoutubeService(ctx context.Context, user string) (*YoutubeService, error) {
 	// TODO move env vars to main.go
 	apiKey := os.Getenv("YOUTUBE_API_KEY")

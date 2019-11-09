@@ -25,6 +25,8 @@ func RunHttpServer(api *API) {
 
 	r.HandleFunc("/login/{user}", LoginHandler(api))
 
+	r.HandleFunc("/{user}/{service}/playlists", GetPlaylistHandler(api))
+
 	// This is called after a user has logged in and recieved a valid username. We do this to kick off the authentication process for a service. It returns a url
 	r.HandleFunc("/register/{user}/{service}", RegisterHandler(api))
 
@@ -42,6 +44,34 @@ func RunHttpServer(api *API) {
 
 	log.Printf("Serving %s on HTTP port: %s\n", rootDir, port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func GetPlaylistHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		username := vars["user"]
+		svc := vars["service"]
+
+		lameUser, ok := api.GetUser(username)
+		if !ok {
+			fmt.Printf("no user registered for user: %s", username)
+		}
+
+		ssvc, okay := lameUser.ServiceAccounts[svc]
+		if !okay {
+			fmt.Printf("User: %s is not authorized for svc %s", username, svc)
+			w.WriteHeader(http.StatusBadRequest)
+			io.WriteString(w, "Couldnt get svc")
+		}
+
+		_ = ssvc.GetPlaylists()
+
+		api.LoginUser(username)
+
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 }
 
 func LoginHandler(api *API) func(w http.ResponseWriter, r *http.Request) {
