@@ -1,5 +1,4 @@
 /*
-Serve is a very simple static file server in go
 Usage:
 	-p="8100": port to serve on
 	-d=".":    the directory of static files to host
@@ -12,15 +11,21 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
-	port := flag.String("p", "80", "port to serve on")
-	directory := flag.String("d", ".", "the directory of static file to host")
+	// heroku creates this env var automagically
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = *(flag.String("p", "80", "port to serve on"))
+	}
 	flag.Parse()
 
-	http.Handle("/", http.FileServer(http.Dir(*directory)))
+	directory := "./build"
+	http.Handle("/", http.FileServer(http.Dir(directory)))
+	http.Handle("/spotify", handle)
 
-	log.Printf("Serving %s on HTTP port: %s\n", *directory, *port)
-	log.Fatal(http.ListenAndServe(":"+*port, nil))
+	log.Printf("Serving %s on HTTP port: %s\n", directory, port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

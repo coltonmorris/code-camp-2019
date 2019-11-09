@@ -1,0 +1,116 @@
+.App {
+  text-align: center;
+  background-color: #EEEEEE;
+}
+
+.AppOuter {
+  display: flex;
+  justify-content: center;
+}
+
+.AppContainer {
+  background-color: white;
+  width: 800px;
+  height: calc(100vh - 75px);
+}
+
+.App-header {
+  background-color: #282c34;
+  height: 75px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+.JobsTitle {
+  text-align: left;
+  margin-bottom: 5px;
+  font-size: calc(10px + 2vmin);
+}
+
+.JobsOuter {
+  display: flex;
+  justify-content: center;
+}
+
+.JobsContainer {
+  width: 80%;
+}
+
+.Playlist {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: calc(2vmin);
+  margin-top: 10px;
+}
+
+.PlaylistContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.PlaylistList {
+  width: 80%;
+}
+
+.PlaylistTitle {
+  text-align: left;
+  margin-bottom: 5px;
+  font-size: calc(10px + 2vmin);
+}
+
+.ProfileContainer {
+  margin-top: 20px;
+  font-size: calc(10px + 2vmin);
+}
+
+.ProgressBarTitle {
+  font-size: calc(2vmin);
+  text-align: left;
+  padding-left: 10px;
+  padding: 4px;
+}
+
+.ProgressBar {
+  height: 20px
+}
+
+.LinkedAccountContainer {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.PlaylistLinkButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.SyncPlaylistButton {
+  height: 40px;
+  width: 40px;
+  background-size: 40px 40px;
+}
+
+.LinkAccountButton {
+  height: 140px;
+  width: 140px;
+  background-size: 140px 140px;
+}
+
+.SyncPlaylistContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 140px;
+}
