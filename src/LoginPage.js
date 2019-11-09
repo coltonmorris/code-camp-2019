@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { login } from './api';
@@ -9,6 +9,13 @@ import 'react-toastify/dist/ReactToastify.css';
 function LoginPage(props) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const savedUser = window.localStorage.getItem('name');
+    if (savedUser) {
+      props.loginSuccess(savedUser);
+    }
+  })
 
   const doLogin = async () => {
     setLoading(true);
