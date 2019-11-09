@@ -18,15 +18,15 @@ func main() {
 		spotifyRedirectURI = "http://localhost:8080/callback/spotify"
 	}
 
-	youtubeRedirectUri := os.Getenv("YOUTUBE_REDIRECT")
-	if youtubeRedirectUri == "" {
-		youtubeRedirectUri = "http://localhost:8080/callback/youtube"
+	youtubeRedirectURI := os.Getenv("YOUTUBE_REDIRECT")
+	if youtubeRedirectURI == "" {
+		youtubeRedirectURI = "http://localhost:8080/callback/youtube"
 	}
 
 	api := &API{
 		Users:              make(map[string]*LameUser, 0),
 		SpotifyRedirectURI: spotifyRedirectURI,
-		YoutubeRedirectUri: youtubeRedirectUri,
+		YoutubeRedirectURI: youtubeRedirectURI,
 	}
 
 	RunHttpServer(api)

@@ -134,6 +134,8 @@ func AuthCallbackHandler(api *API) func(w http.ResponseWriter, r *http.Request) 
 			ok bool
 		}
 		json.NewEncoder(w).Encode(response{ok: true})
+
+		http.Redirect(w, r, "http://"+r.Host+r.URL.String(), http.StatusMovedPermanently)
 	}
 }
 
